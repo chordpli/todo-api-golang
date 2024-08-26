@@ -34,6 +34,9 @@ go get github.com/stretchr/testify/assert
 # viper
 go get -u github.com/spf13/viper
 
+# validator
+go get -u github.com/go-playground/validator/v10
+
 ## mock 생성
 mockgen -source=internal/api/user/repository.go -destination=test/{domain}/mock/mock_{domain}_repository.go -package=user
 

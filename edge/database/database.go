@@ -4,12 +4,20 @@ import (
 	"context"
 	"log"
 	"todo-api-golang/ent"
+	"todo-api-golang/util"
 
 	_ "github.com/go-sql-driver/mysql"
 )
 
 func InitDB() *ent.Client {
-	dsn := "root:0000@tcp(localhost:3306)/todo?parseTime=True"
+	config, err := util.LoadConfig(".")
+
+	if err != nil {
+		panic(err)
+	}
+
+	dsn := config.RDB
+
 	client, err := ent.Open("mysql", dsn)
 	if err != nil {
 		log.Fatalf("failed opening connection to mysql: %v", err)
