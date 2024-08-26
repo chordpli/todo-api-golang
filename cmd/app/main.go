@@ -21,6 +21,6 @@ func main() {
 
 	log.Logger.Println("Server is running on http://localhost:8080")
 	if err := http.ListenAndServe(":8080", r); err != nil {
-		log.Logger.Fatalf("failed to start server: %v", err)
+		log.Logger.Fatal()
 	}
 }
