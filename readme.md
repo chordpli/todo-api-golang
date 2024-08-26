@@ -31,6 +31,9 @@ go install github.com/golang/mock/mockgen@latest
 go get github.com/golang/mock/gomock
 go get github.com/stretchr/testify/assert
 
+# viper
+go get -u github.com/spf13/viper
+
 ## mock 생성
 mockgen -source=internal/api/user/repository.go -destination=test/{domain}/mock/mock_{domain}_repository.go -package=user
 
