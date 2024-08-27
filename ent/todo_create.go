@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 	"todo-api-golang/ent/todo"
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -17,6 +18,34 @@ type TodoCreate struct {
 	config
 	mutation *TodoMutation
 	hooks    []Hook
+}
+
+// SetCreateTime sets the "create_time" field.
+func (tc *TodoCreate) SetCreateTime(t time.Time) *TodoCreate {
+	tc.mutation.SetCreateTime(t)
+	return tc
+}
+
+// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableCreateTime(t *time.Time) *TodoCreate {
+	if t != nil {
+		tc.SetCreateTime(*t)
+	}
+	return tc
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (tc *TodoCreate) SetUpdateTime(t time.Time) *TodoCreate {
+	tc.mutation.SetUpdateTime(t)
+	return tc
+}
+
+// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableUpdateTime(t *time.Time) *TodoCreate {
+	if t != nil {
+		tc.SetUpdateTime(*t)
+	}
+	return tc
 }
 
 // SetTitle sets the "title" field.
@@ -49,6 +78,20 @@ func (tc *TodoCreate) SetStatus(t todo.Status) *TodoCreate {
 func (tc *TodoCreate) SetNillableStatus(t *todo.Status) *TodoCreate {
 	if t != nil {
 		tc.SetStatus(*t)
+	}
+	return tc
+}
+
+// SetDeletedAt sets the "deleted_at" field.
+func (tc *TodoCreate) SetDeletedAt(t time.Time) *TodoCreate {
+	tc.mutation.SetDeletedAt(t)
+	return tc
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableDeletedAt(t *time.Time) *TodoCreate {
+	if t != nil {
+		tc.SetDeletedAt(*t)
 	}
 	return tc
 }
@@ -88,6 +131,14 @@ func (tc *TodoCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tc *TodoCreate) defaults() {
+	if _, ok := tc.mutation.CreateTime(); !ok {
+		v := todo.DefaultCreateTime()
+		tc.mutation.SetCreateTime(v)
+	}
+	if _, ok := tc.mutation.UpdateTime(); !ok {
+		v := todo.DefaultUpdateTime()
+		tc.mutation.SetUpdateTime(v)
+	}
 	if _, ok := tc.mutation.Status(); !ok {
 		v := todo.DefaultStatus
 		tc.mutation.SetStatus(v)
@@ -96,6 +147,12 @@ func (tc *TodoCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TodoCreate) check() error {
+	if _, ok := tc.mutation.CreateTime(); !ok {
+		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "Todo.create_time"`)}
+	}
+	if _, ok := tc.mutation.UpdateTime(); !ok {
+		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "Todo.update_time"`)}
+	}
 	if _, ok := tc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Todo.title"`)}
 	}
@@ -138,6 +195,14 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 		_node = &Todo{config: tc.config}
 		_spec = sqlgraph.NewCreateSpec(todo.Table, sqlgraph.NewFieldSpec(todo.FieldID, field.TypeInt))
 	)
+	if value, ok := tc.mutation.CreateTime(); ok {
+		_spec.SetField(todo.FieldCreateTime, field.TypeTime, value)
+		_node.CreateTime = value
+	}
+	if value, ok := tc.mutation.UpdateTime(); ok {
+		_spec.SetField(todo.FieldUpdateTime, field.TypeTime, value)
+		_node.UpdateTime = value
+	}
 	if value, ok := tc.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
 		_node.Title = value
@@ -149,6 +214,10 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 	if value, ok := tc.mutation.Status(); ok {
 		_spec.SetField(todo.FieldStatus, field.TypeEnum, value)
 		_node.Status = value
+	}
+	if value, ok := tc.mutation.DeletedAt(); ok {
+		_spec.SetField(todo.FieldDeletedAt, field.TypeTime, value)
+		_node.DeletedAt = &value
 	}
 	return _node, _spec
 }

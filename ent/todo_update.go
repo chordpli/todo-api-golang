@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 	"todo-api-golang/ent/predicate"
 	"todo-api-golang/ent/todo"
 
@@ -24,6 +25,12 @@ type TodoUpdate struct {
 // Where appends a list predicates to the TodoUpdate builder.
 func (tu *TodoUpdate) Where(ps ...predicate.Todo) *TodoUpdate {
 	tu.mutation.Where(ps...)
+	return tu
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (tu *TodoUpdate) SetUpdateTime(t time.Time) *TodoUpdate {
+	tu.mutation.SetUpdateTime(t)
 	return tu
 }
 
@@ -75,6 +82,26 @@ func (tu *TodoUpdate) SetNillableStatus(t *todo.Status) *TodoUpdate {
 	return tu
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (tu *TodoUpdate) SetDeletedAt(t time.Time) *TodoUpdate {
+	tu.mutation.SetDeletedAt(t)
+	return tu
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (tu *TodoUpdate) SetNillableDeletedAt(t *time.Time) *TodoUpdate {
+	if t != nil {
+		tu.SetDeletedAt(*t)
+	}
+	return tu
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (tu *TodoUpdate) ClearDeletedAt() *TodoUpdate {
+	tu.mutation.ClearDeletedAt()
+	return tu
+}
+
 // Mutation returns the TodoMutation object of the builder.
 func (tu *TodoUpdate) Mutation() *TodoMutation {
 	return tu.mutation
@@ -82,6 +109,7 @@ func (tu *TodoUpdate) Mutation() *TodoMutation {
 
 // Save executes the query and returns the number of nodes affected by the update operation.
 func (tu *TodoUpdate) Save(ctx context.Context) (int, error) {
+	tu.defaults()
 	return withHooks(ctx, tu.sqlSave, tu.mutation, tu.hooks)
 }
 
@@ -104,6 +132,14 @@ func (tu *TodoUpdate) Exec(ctx context.Context) error {
 func (tu *TodoUpdate) ExecX(ctx context.Context) {
 	if err := tu.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (tu *TodoUpdate) defaults() {
+	if _, ok := tu.mutation.UpdateTime(); !ok {
+		v := todo.UpdateDefaultUpdateTime()
+		tu.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -134,6 +170,9 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
+	if value, ok := tu.mutation.UpdateTime(); ok {
+		_spec.SetField(todo.FieldUpdateTime, field.TypeTime, value)
+	}
 	if value, ok := tu.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
 	}
@@ -145,6 +184,12 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 	}
 	if value, ok := tu.mutation.Status(); ok {
 		_spec.SetField(todo.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := tu.mutation.DeletedAt(); ok {
+		_spec.SetField(todo.FieldDeletedAt, field.TypeTime, value)
+	}
+	if tu.mutation.DeletedAtCleared() {
+		_spec.ClearField(todo.FieldDeletedAt, field.TypeTime)
 	}
 	if n, err = sqlgraph.UpdateNodes(ctx, tu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
@@ -164,6 +209,12 @@ type TodoUpdateOne struct {
 	fields   []string
 	hooks    []Hook
 	mutation *TodoMutation
+}
+
+// SetUpdateTime sets the "update_time" field.
+func (tuo *TodoUpdateOne) SetUpdateTime(t time.Time) *TodoUpdateOne {
+	tuo.mutation.SetUpdateTime(t)
+	return tuo
 }
 
 // SetTitle sets the "title" field.
@@ -214,6 +265,26 @@ func (tuo *TodoUpdateOne) SetNillableStatus(t *todo.Status) *TodoUpdateOne {
 	return tuo
 }
 
+// SetDeletedAt sets the "deleted_at" field.
+func (tuo *TodoUpdateOne) SetDeletedAt(t time.Time) *TodoUpdateOne {
+	tuo.mutation.SetDeletedAt(t)
+	return tuo
+}
+
+// SetNillableDeletedAt sets the "deleted_at" field if the given value is not nil.
+func (tuo *TodoUpdateOne) SetNillableDeletedAt(t *time.Time) *TodoUpdateOne {
+	if t != nil {
+		tuo.SetDeletedAt(*t)
+	}
+	return tuo
+}
+
+// ClearDeletedAt clears the value of the "deleted_at" field.
+func (tuo *TodoUpdateOne) ClearDeletedAt() *TodoUpdateOne {
+	tuo.mutation.ClearDeletedAt()
+	return tuo
+}
+
 // Mutation returns the TodoMutation object of the builder.
 func (tuo *TodoUpdateOne) Mutation() *TodoMutation {
 	return tuo.mutation
@@ -234,6 +305,7 @@ func (tuo *TodoUpdateOne) Select(field string, fields ...string) *TodoUpdateOne 
 
 // Save executes the query and returns the updated Todo entity.
 func (tuo *TodoUpdateOne) Save(ctx context.Context) (*Todo, error) {
+	tuo.defaults()
 	return withHooks(ctx, tuo.sqlSave, tuo.mutation, tuo.hooks)
 }
 
@@ -256,6 +328,14 @@ func (tuo *TodoUpdateOne) Exec(ctx context.Context) error {
 func (tuo *TodoUpdateOne) ExecX(ctx context.Context) {
 	if err := tuo.Exec(ctx); err != nil {
 		panic(err)
+	}
+}
+
+// defaults sets the default values of the builder before save.
+func (tuo *TodoUpdateOne) defaults() {
+	if _, ok := tuo.mutation.UpdateTime(); !ok {
+		v := todo.UpdateDefaultUpdateTime()
+		tuo.mutation.SetUpdateTime(v)
 	}
 }
 
@@ -303,6 +383,9 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 			}
 		}
 	}
+	if value, ok := tuo.mutation.UpdateTime(); ok {
+		_spec.SetField(todo.FieldUpdateTime, field.TypeTime, value)
+	}
 	if value, ok := tuo.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
 	}
@@ -314,6 +397,12 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 	}
 	if value, ok := tuo.mutation.Status(); ok {
 		_spec.SetField(todo.FieldStatus, field.TypeEnum, value)
+	}
+	if value, ok := tuo.mutation.DeletedAt(); ok {
+		_spec.SetField(todo.FieldDeletedAt, field.TypeTime, value)
+	}
+	if tuo.mutation.DeletedAtCleared() {
+		_spec.ClearField(todo.FieldDeletedAt, field.TypeTime)
 	}
 	_node = &Todo{config: tuo.config}
 	_spec.Assign = _node.assignValues

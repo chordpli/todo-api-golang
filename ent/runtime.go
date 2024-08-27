@@ -3,6 +3,7 @@
 package ent
 
 import (
+	"time"
 	"todo-api-golang/ent/schema"
 	"todo-api-golang/ent/todo"
 )
@@ -11,8 +12,21 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	todoMixin := schema.Todo{}.Mixin()
+	todoMixinFields0 := todoMixin[0].Fields()
+	_ = todoMixinFields0
 	todoFields := schema.Todo{}.Fields()
 	_ = todoFields
+	// todoDescCreateTime is the schema descriptor for create_time field.
+	todoDescCreateTime := todoMixinFields0[0].Descriptor()
+	// todo.DefaultCreateTime holds the default value on creation for the create_time field.
+	todo.DefaultCreateTime = todoDescCreateTime.Default.(func() time.Time)
+	// todoDescUpdateTime is the schema descriptor for update_time field.
+	todoDescUpdateTime := todoMixinFields0[1].Descriptor()
+	// todo.DefaultUpdateTime holds the default value on creation for the update_time field.
+	todo.DefaultUpdateTime = todoDescUpdateTime.Default.(func() time.Time)
+	// todo.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	todo.UpdateDefaultUpdateTime = todoDescUpdateTime.UpdateDefault.(func() time.Time)
 	// todoDescTitle is the schema descriptor for title field.
 	todoDescTitle := todoFields[0].Descriptor()
 	// todo.TitleValidator is a validator for the "title" field. It is called by the builders before save.
