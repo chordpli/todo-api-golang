@@ -2,6 +2,8 @@ package response
 
 import (
 	"encoding/json"
+	"github.com/go-playground/validator/v10"
+	"log"
 	"net/http"
 )
 
@@ -28,6 +30,7 @@ func BindAndValid(r *http.Request, form interface{}) (int, int) {
 	// 요청 본문을 바인딩
 	err := json.NewDecoder(r.Body).Decode(form)
 	if err != nil {
+		log.Fatalf("Failed to decode the request body: %v", err)
 		return http.StatusBadRequest, 400
 	}
 
@@ -35,6 +38,7 @@ func BindAndValid(r *http.Request, form interface{}) (int, int) {
 	validate := validator.New()
 	err = validate.Struct(form)
 	if err != nil {
+		log.Fatalf("Failed to decode the request body: %v", err)
 		return http.StatusBadRequest, 400
 	}
 
