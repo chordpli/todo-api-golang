@@ -10,6 +10,7 @@ import (
 	"todo-api-golang/edge/database"
 	"todo-api-golang/ent"
 	"todo-api-golang/ent/todo"
+	"todo-api-golang/internal/dto"
 	response "todo-api-golang/middleware"
 )
 
@@ -51,7 +52,7 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 
 	status := todo.Status(form.Status)
 
-	todos, err := client.Todo.
+	todoItem, err := client.Todo.
 		Create().
 		SetTitle(form.Title).
 		SetDescription(form.Description).
@@ -64,7 +65,8 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ResponseJSON(w, http.StatusOK, 200, "Todo created successfully", todos)
+	todoDTO := dto.ConvertTodoToDTO(todoItem)
+	response.ResponseJSON(w, http.StatusOK, 200, "Todo created successfully", todoDTO)
 }
 
 // ListTodos godoc
@@ -85,7 +87,12 @@ func ListTodos(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ResponseJSON(w, http.StatusOK, 200, "Todos fetched successfully", todos)
+	todoDTOs := make([]dto.TodoDTO, len(todos))
+	for i, t := range todos {
+		todoDTOs[i] = dto.ConvertTodoToDTO(t)
+	}
+
+	response.ResponseJSON(w, http.StatusOK, 200, "Todos fetched successfully", todoDTOs)
 }
 
 // GetTodo godoc
@@ -101,14 +108,12 @@ func ListTodos(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/todos/{id} [get]
 func GetTodo(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-
 	if err != nil {
 		response.ResponseJSON(w, http.StatusBadRequest, 400, "Invalid todo ID", nil)
 		return
 	}
 
-	todos, err := client.Todo.Get(context.Background(), id)
-
+	todoItem, err := client.Todo.Get(context.Background(), id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			response.ResponseJSON(w, http.StatusNotFound, 404, "Todo not found", nil)
@@ -118,7 +123,8 @@ func GetTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ResponseJSON(w, http.StatusOK, 200, "Todo fetched successfully", todos)
+	todoDTO := dto.ConvertTodoToDTO(todoItem)
+	response.ResponseJSON(w, http.StatusOK, 200, "Todo fetched successfully", todoDTO)
 }
 
 // UpdateTodo godoc
@@ -136,7 +142,6 @@ func GetTodo(w http.ResponseWriter, r *http.Request) {
 // @Router /api/v1/todos/{id} [put]
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
-
 	if err != nil {
 		response.ResponseJSON(w, http.StatusBadRequest, 400, "Invalid todo ID", nil)
 		return
@@ -149,8 +154,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	todos, err := client.Todo.Get(context.Background(), id)
-
+	todoItem, err := client.Todo.Get(context.Background(), id)
 	if err != nil {
 		if ent.IsNotFound(err) {
 			response.ResponseJSON(w, http.StatusNotFound, 404, "Todo not found", nil)
@@ -162,7 +166,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 
 	status := todo.Status(form.Status)
 
-	_, err = todos.Update().
+	_, err = todoItem.Update().
 		SetTitle(form.Title).
 		SetDescription(form.Description).
 		SetStatus(status).
@@ -173,7 +177,8 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ResponseJSON(w, http.StatusOK, 200, "Todo updated successfully", todos)
+	todoDTO := dto.ConvertTodoToDTO(todoItem)
+	response.ResponseJSON(w, http.StatusOK, 200, "Todo updated successfully", todoDTO)
 }
 
 // DeleteTodo godoc
