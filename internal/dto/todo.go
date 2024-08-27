@@ -28,3 +28,14 @@ func ConvertTodoToDTO(todo *ent.Todo) TodoDTO {
 		DeletedAt:   todo.DeletedAt,
 	}
 }
+
+// TodoForm is the structure for creating or updating a Todo item.
+type TodoForm struct {
+	Title       string `json:"title" validate:"required"`
+	Description string `json:"description"`
+	Status      string `json:"status" validate:"required,oneof=PENDING COMPLETED PROGRESS"`
+}
+
+type UpdateStatusForm struct {
+	Status string `json:"status" validate:"required,oneof=PENDING COMPLETED PROGRESS"`
+}

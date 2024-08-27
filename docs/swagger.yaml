@@ -1,6 +1,6 @@
 basePath: /
 definitions:
-  handlers.TodoForm:
+  dto.TodoForm:
     properties:
       description:
         type: string
@@ -16,7 +16,7 @@ definitions:
     - status
     - title
     type: object
-  handlers.UpdateStatusForm:
+  dto.UpdateStatusForm:
     properties:
       status:
         enum:
@@ -71,7 +71,7 @@ paths:
         name: todo
         required: true
         schema:
-          $ref: '#/definitions/handlers.TodoForm'
+          $ref: '#/definitions/dto.TodoForm'
       produces:
       - application/json
       responses:
@@ -101,7 +101,7 @@ paths:
         type: integer
       responses:
         "204":
-          description: No Content
+          description: No content
         "400":
           description: Bad Request
           schema:
@@ -162,7 +162,7 @@ paths:
         name: todo
         required: true
         schema:
-          $ref: '#/definitions/handlers.TodoForm'
+          $ref: '#/definitions/dto.TodoForm'
       produces:
       - application/json
       responses:
@@ -201,7 +201,7 @@ paths:
         name: status
         required: true
         schema:
-          $ref: '#/definitions/handlers.UpdateStatusForm'
+          $ref: '#/definitions/dto.UpdateStatusForm'
       produces:
       - application/json
       responses:

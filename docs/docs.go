@@ -62,7 +62,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.TodoForm"
+                            "$ref": "#/definitions/dto.TodoForm"
                         }
                     }
                 ],
@@ -160,7 +160,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.TodoForm"
+                            "$ref": "#/definitions/dto.TodoForm"
                         }
                     }
                 ],
@@ -208,7 +208,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "204": {
-                        "description": "No Content"
+                        "description": "No content"
                     },
                     "400": {
                         "description": "Bad Request",
@@ -258,7 +258,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/handlers.UpdateStatusForm"
+                            "$ref": "#/definitions/dto.UpdateStatusForm"
                         }
                     }
                 ],
@@ -292,7 +292,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "handlers.TodoForm": {
+        "dto.TodoForm": {
             "type": "object",
             "required": [
                 "status",
@@ -315,7 +315,7 @@ const docTemplate = `{
                 }
             }
         },
-        "handlers.UpdateStatusForm": {
+        "dto.UpdateStatusForm": {
             "type": "object",
             "required": [
                 "status"
