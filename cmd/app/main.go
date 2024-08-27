@@ -1,26 +1,33 @@
 package main
 
 import (
+	"log"
 	"net/http"
-
-	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"todo-api-golang/edge/log"
 	"todo-api-golang/internal/routes"
+	"todo-api-golang/util"
+
+	_ "todo-api-golang/docs" // Swagger docs 패키지 임포트
 )
 
+// @title Todo API
+// @version 1.0
+// @description This is a sample server for managing todos.
+// @host localhost:8000
+// @BasePath /
+
+// @securityDefinitions.basic BasicAuth
 func main() {
-	log.Logger.Println("Starting server...")
 
-	r := chi.NewRouter()
-	r.Use(middleware.Logger)
-	r.Use(middleware.Recoverer)
-
-	// 통합된 라우트 등록
-	routes.RegisterRoutes(r)
-
-	log.Logger.Println("Server is running on http://localhost:8080")
-	if err := http.ListenAndServe(":8080", r); err != nil {
-		log.Logger.Fatal()
+	config, err := util.LoadConfig(".")
+	if err != nil {
+		log.Fatal("cannot load config:", err)
 	}
+
+	server := &http.Server{
+		Addr:    config.PORT,
+		Handler: routes.Router(),
+	}
+
+	log.Fatal(server.ListenAndServe())
+
 }
