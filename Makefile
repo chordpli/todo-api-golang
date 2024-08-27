@@ -5,3 +5,7 @@ docs:
 .PHONY: api
 api: docs
 	go run ./cmd/app/main.go
+
+.PHONY: ent
+ent:
+	go generate ./ent
