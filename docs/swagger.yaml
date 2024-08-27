@@ -16,6 +16,17 @@ definitions:
     - status
     - title
     type: object
+  handlers.UpdateStatusForm:
+    properties:
+      status:
+        enum:
+        - PENDING
+        - COMPLETED
+        - PROGRESS
+        type: string
+    required:
+    - status
+    type: object
   response.Response:
     properties:
       code:
@@ -172,6 +183,45 @@ paths:
           schema:
             $ref: '#/definitions/response.Response'
       summary: Update an existing Todo
+      tags:
+      - todos
+  /api/v1/todos/{id}/status:
+    put:
+      consumes:
+      - application/json
+      description: Update only the status field of a Todo by its ID
+      parameters:
+      - description: Todo ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: New status
+        in: body
+        name: status
+        required: true
+        schema:
+          $ref: '#/definitions/handlers.UpdateStatusForm'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/response.Response'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/response.Response'
+        "404":
+          description: Not Found
+          schema:
+            $ref: '#/definitions/response.Response'
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/response.Response'
+      summary: Update the status of a Todo
       tags:
       - todos
 securityDefinitions:

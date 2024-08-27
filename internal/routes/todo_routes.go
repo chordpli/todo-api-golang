@@ -13,6 +13,7 @@ func TodoRoutes() chi.Router {
 	r.Get("/{id}", handlers.GetTodo)
 	r.Put("/{id}", handlers.UpdateTodo)
 	r.Delete("/{id}", handlers.DeleteTodo)
+	r.Put("/{id}/status", handlers.UpdateTodoStatus)
 
 	return r
 }

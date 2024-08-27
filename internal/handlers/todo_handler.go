@@ -29,6 +29,10 @@ type TodoForm struct {
 	Status      string `json:"status" validate:"required,oneof=PENDING COMPLETED PROGRESS"`
 }
 
+type UpdateStatusForm struct {
+	Status string `json:"status" validate:"required,oneof=PENDING COMPLETED PROGRESS"`
+}
+
 // CreateTodo godoc
 // @Summary Create a new Todo
 // @Description Create a new Todo with the given details
@@ -214,4 +218,54 @@ func DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	response.ResponseJSON(w, http.StatusNoContent, 204, "Todo deleted successfully", nil)
+}
+
+// UpdateTodoStatus godoc
+// @Summary Update the status of a Todo
+// @Description Update only the status field of a Todo by its ID
+// @Tags todos
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Todo ID"
+// @Param status body UpdateStatusForm true "New status"
+// @Success 200 {object} response.Response
+// @Failure 400 {object} response.Response
+// @Failure 404 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/todos/{id}/status [put]
+func UpdateTodoStatus(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+	if err != nil {
+		response.ResponseJSON(w, http.StatusBadRequest, 400, "Invalid todo ID", nil)
+		return
+	}
+
+	var form UpdateStatusForm
+	httpCode, errCode := response.BindAndValid(r, &form)
+	if httpCode != http.StatusOK {
+		response.ResponseJSON(w, httpCode, errCode, "Invalid form data", nil)
+		return
+	}
+
+	todoItem, err := client.Todo.Get(context.Background(), id)
+	if err != nil {
+		if ent.IsNotFound(err) {
+			response.ResponseJSON(w, http.StatusNotFound, 404, "Todo not found", nil)
+		} else {
+			response.ResponseJSON(w, http.StatusInternalServerError, 500, "Failed to fetch todo", nil)
+		}
+		return
+	}
+
+	// Update the status field
+	_, err = todoItem.Update().
+		SetStatus(todo.Status(form.Status)).
+		Save(context.Background())
+
+	if err != nil {
+		response.ResponseJSON(w, http.StatusInternalServerError, 500, "Failed to update status", nil)
+		return
+	}
+
+	response.ResponseJSON(w, http.StatusOK, 200, "Status updated successfully", nil)
 }
