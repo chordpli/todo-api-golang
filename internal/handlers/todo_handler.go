@@ -11,12 +11,21 @@ import (
 	response "todo-api-golang/middleware"
 )
 
+type TodoHandlerInterface interface {
+	CreateTodo(w http.ResponseWriter, r *http.Request)
+	ListTodos(w http.ResponseWriter, r *http.Request)
+	GetTodo(w http.ResponseWriter, r *http.Request)
+	UpdateTodo(w http.ResponseWriter, r *http.Request)
+	DeleteTodo(w http.ResponseWriter, r *http.Request)
+	UpdateTodoStatus(w http.ResponseWriter, r *http.Request)
+}
+
 type TodoHandler struct {
 	service service.TodoService
 }
 
 // NewTodoHandler creates a new TodoHandler.
-func NewTodoHandler(service service.TodoService) *TodoHandler {
+func NewTodoHandler(service service.TodoService) TodoHandlerInterface {
 	return &TodoHandler{service: service}
 }
 
