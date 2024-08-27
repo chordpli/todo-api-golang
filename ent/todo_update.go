@@ -28,9 +28,9 @@ func (tu *TodoUpdate) Where(ps ...predicate.Todo) *TodoUpdate {
 	return tu
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (tu *TodoUpdate) SetUpdateTime(t time.Time) *TodoUpdate {
-	tu.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (tu *TodoUpdate) SetUpdatedAt(t time.Time) *TodoUpdate {
+	tu.mutation.SetUpdatedAt(t)
 	return tu
 }
 
@@ -137,9 +137,9 @@ func (tu *TodoUpdate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tu *TodoUpdate) defaults() {
-	if _, ok := tu.mutation.UpdateTime(); !ok {
-		v := todo.UpdateDefaultUpdateTime()
-		tu.mutation.SetUpdateTime(v)
+	if _, ok := tu.mutation.UpdatedAt(); !ok {
+		v := todo.UpdateDefaultUpdatedAt()
+		tu.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -170,8 +170,8 @@ func (tu *TodoUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			}
 		}
 	}
-	if value, ok := tu.mutation.UpdateTime(); ok {
-		_spec.SetField(todo.FieldUpdateTime, field.TypeTime, value)
+	if value, ok := tu.mutation.UpdatedAt(); ok {
+		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := tu.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)
@@ -211,9 +211,9 @@ type TodoUpdateOne struct {
 	mutation *TodoMutation
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (tuo *TodoUpdateOne) SetUpdateTime(t time.Time) *TodoUpdateOne {
-	tuo.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (tuo *TodoUpdateOne) SetUpdatedAt(t time.Time) *TodoUpdateOne {
+	tuo.mutation.SetUpdatedAt(t)
 	return tuo
 }
 
@@ -333,9 +333,9 @@ func (tuo *TodoUpdateOne) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tuo *TodoUpdateOne) defaults() {
-	if _, ok := tuo.mutation.UpdateTime(); !ok {
-		v := todo.UpdateDefaultUpdateTime()
-		tuo.mutation.SetUpdateTime(v)
+	if _, ok := tuo.mutation.UpdatedAt(); !ok {
+		v := todo.UpdateDefaultUpdatedAt()
+		tuo.mutation.SetUpdatedAt(v)
 	}
 }
 
@@ -383,8 +383,8 @@ func (tuo *TodoUpdateOne) sqlSave(ctx context.Context) (_node *Todo, err error) 
 			}
 		}
 	}
-	if value, ok := tuo.mutation.UpdateTime(); ok {
-		_spec.SetField(todo.FieldUpdateTime, field.TypeTime, value)
+	if value, ok := tuo.mutation.UpdatedAt(); ok {
+		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
 	}
 	if value, ok := tuo.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)

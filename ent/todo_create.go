@@ -20,30 +20,30 @@ type TodoCreate struct {
 	hooks    []Hook
 }
 
-// SetCreateTime sets the "create_time" field.
-func (tc *TodoCreate) SetCreateTime(t time.Time) *TodoCreate {
-	tc.mutation.SetCreateTime(t)
+// SetCreatedAt sets the "created_at" field.
+func (tc *TodoCreate) SetCreatedAt(t time.Time) *TodoCreate {
+	tc.mutation.SetCreatedAt(t)
 	return tc
 }
 
-// SetNillableCreateTime sets the "create_time" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableCreateTime(t *time.Time) *TodoCreate {
+// SetNillableCreatedAt sets the "created_at" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableCreatedAt(t *time.Time) *TodoCreate {
 	if t != nil {
-		tc.SetCreateTime(*t)
+		tc.SetCreatedAt(*t)
 	}
 	return tc
 }
 
-// SetUpdateTime sets the "update_time" field.
-func (tc *TodoCreate) SetUpdateTime(t time.Time) *TodoCreate {
-	tc.mutation.SetUpdateTime(t)
+// SetUpdatedAt sets the "updated_at" field.
+func (tc *TodoCreate) SetUpdatedAt(t time.Time) *TodoCreate {
+	tc.mutation.SetUpdatedAt(t)
 	return tc
 }
 
-// SetNillableUpdateTime sets the "update_time" field if the given value is not nil.
-func (tc *TodoCreate) SetNillableUpdateTime(t *time.Time) *TodoCreate {
+// SetNillableUpdatedAt sets the "updated_at" field if the given value is not nil.
+func (tc *TodoCreate) SetNillableUpdatedAt(t *time.Time) *TodoCreate {
 	if t != nil {
-		tc.SetUpdateTime(*t)
+		tc.SetUpdatedAt(*t)
 	}
 	return tc
 }
@@ -131,13 +131,13 @@ func (tc *TodoCreate) ExecX(ctx context.Context) {
 
 // defaults sets the default values of the builder before save.
 func (tc *TodoCreate) defaults() {
-	if _, ok := tc.mutation.CreateTime(); !ok {
-		v := todo.DefaultCreateTime()
-		tc.mutation.SetCreateTime(v)
+	if _, ok := tc.mutation.CreatedAt(); !ok {
+		v := todo.DefaultCreatedAt()
+		tc.mutation.SetCreatedAt(v)
 	}
-	if _, ok := tc.mutation.UpdateTime(); !ok {
-		v := todo.DefaultUpdateTime()
-		tc.mutation.SetUpdateTime(v)
+	if _, ok := tc.mutation.UpdatedAt(); !ok {
+		v := todo.DefaultUpdatedAt()
+		tc.mutation.SetUpdatedAt(v)
 	}
 	if _, ok := tc.mutation.Status(); !ok {
 		v := todo.DefaultStatus
@@ -147,11 +147,11 @@ func (tc *TodoCreate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (tc *TodoCreate) check() error {
-	if _, ok := tc.mutation.CreateTime(); !ok {
-		return &ValidationError{Name: "create_time", err: errors.New(`ent: missing required field "Todo.create_time"`)}
+	if _, ok := tc.mutation.CreatedAt(); !ok {
+		return &ValidationError{Name: "created_at", err: errors.New(`ent: missing required field "Todo.created_at"`)}
 	}
-	if _, ok := tc.mutation.UpdateTime(); !ok {
-		return &ValidationError{Name: "update_time", err: errors.New(`ent: missing required field "Todo.update_time"`)}
+	if _, ok := tc.mutation.UpdatedAt(); !ok {
+		return &ValidationError{Name: "updated_at", err: errors.New(`ent: missing required field "Todo.updated_at"`)}
 	}
 	if _, ok := tc.mutation.Title(); !ok {
 		return &ValidationError{Name: "title", err: errors.New(`ent: missing required field "Todo.title"`)}
@@ -195,13 +195,13 @@ func (tc *TodoCreate) createSpec() (*Todo, *sqlgraph.CreateSpec) {
 		_node = &Todo{config: tc.config}
 		_spec = sqlgraph.NewCreateSpec(todo.Table, sqlgraph.NewFieldSpec(todo.FieldID, field.TypeInt))
 	)
-	if value, ok := tc.mutation.CreateTime(); ok {
-		_spec.SetField(todo.FieldCreateTime, field.TypeTime, value)
-		_node.CreateTime = value
+	if value, ok := tc.mutation.CreatedAt(); ok {
+		_spec.SetField(todo.FieldCreatedAt, field.TypeTime, value)
+		_node.CreatedAt = value
 	}
-	if value, ok := tc.mutation.UpdateTime(); ok {
-		_spec.SetField(todo.FieldUpdateTime, field.TypeTime, value)
-		_node.UpdateTime = value
+	if value, ok := tc.mutation.UpdatedAt(); ok {
+		_spec.SetField(todo.FieldUpdatedAt, field.TypeTime, value)
+		_node.UpdatedAt = value
 	}
 	if value, ok := tc.mutation.Title(); ok {
 		_spec.SetField(todo.FieldTitle, field.TypeString, value)

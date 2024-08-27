@@ -192,11 +192,11 @@ const docTemplate = `{
                 }
             },
             "delete": {
-                "description": "Delete a Todo by its ID",
+                "description": "Soft delete a Todo by setting the deleted_at field",
                 "tags": [
                     "todos"
                 ],
-                "summary": "Delete a Todo by ID",
+                "summary": "Soft delete a Todo by ID",
                 "parameters": [
                     {
                         "type": "integer",

@@ -17,16 +17,16 @@ func init() {
 	_ = todoMixinFields0
 	todoFields := schema.Todo{}.Fields()
 	_ = todoFields
-	// todoDescCreateTime is the schema descriptor for create_time field.
-	todoDescCreateTime := todoMixinFields0[0].Descriptor()
-	// todo.DefaultCreateTime holds the default value on creation for the create_time field.
-	todo.DefaultCreateTime = todoDescCreateTime.Default.(func() time.Time)
-	// todoDescUpdateTime is the schema descriptor for update_time field.
-	todoDescUpdateTime := todoMixinFields0[1].Descriptor()
-	// todo.DefaultUpdateTime holds the default value on creation for the update_time field.
-	todo.DefaultUpdateTime = todoDescUpdateTime.Default.(func() time.Time)
-	// todo.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
-	todo.UpdateDefaultUpdateTime = todoDescUpdateTime.UpdateDefault.(func() time.Time)
+	// todoDescCreatedAt is the schema descriptor for created_at field.
+	todoDescCreatedAt := todoMixinFields0[0].Descriptor()
+	// todo.DefaultCreatedAt holds the default value on creation for the created_at field.
+	todo.DefaultCreatedAt = todoDescCreatedAt.Default.(func() time.Time)
+	// todoDescUpdatedAt is the schema descriptor for updated_at field.
+	todoDescUpdatedAt := todoMixinFields0[1].Descriptor()
+	// todo.DefaultUpdatedAt holds the default value on creation for the updated_at field.
+	todo.DefaultUpdatedAt = todoDescUpdatedAt.Default.(func() time.Time)
+	// todo.UpdateDefaultUpdatedAt holds the default value on update for the updated_at field.
+	todo.UpdateDefaultUpdatedAt = todoDescUpdatedAt.UpdateDefault.(func() time.Time)
 	// todoDescTitle is the schema descriptor for title field.
 	todoDescTitle := todoFields[0].Descriptor()
 	// todo.TitleValidator is a validator for the "title" field. It is called by the builders before save.
