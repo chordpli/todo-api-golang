@@ -7,6 +7,9 @@ go get -u github.com/gin-gonic/gin
 ## cors
 go get github.com/go-chi/cors
 
+## middleware
+go get -u github.com/go-chi/chi/v5/middleware
+
 # log
 go get -u github.com/go-chi/httplog/v2
 
