@@ -3,33 +3,52 @@ package handlers
 import (
 	"context"
 	"github.com/go-chi/chi/v5"
+	"log"
 	"net/http"
 	"strconv"
+	"time"
 	"todo-api-golang/edge/database"
 	"todo-api-golang/ent"
 	"todo-api-golang/ent/todo"
 	response "todo-api-golang/middleware"
 )
 
-var client *ent.Client = database.InitDB()
+var client *ent.Client
+
+func init() {
+	client = database.InitDB()
+	if client == nil {
+		log.Fatal("Failed to initialize database client")
+	}
+}
 
 type TodoForm struct {
 	Title       string `json:"title" validate:"required"`
 	Description string `json:"description"`
-	Status      string `json:"status" validate:"required,oneof='PENDING COMPLETED PROGRESS'"`
+	Status      string `json:"status" validate:"required,oneof=PENDING COMPLETED PROGRESS"`
 }
 
+// CreateTodo godoc
+// @Summary Create a new Todo
+// @Description Create a new Todo with the given details
+// @Tags todos
+// @Accept  json
+// @Produce  json
+// @Param todo body TodoForm true "Todo form"
+// @Success 200 {object} response.Response
+// @Failure 400 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/todos [post]
 func CreateTodo(w http.ResponseWriter, r *http.Request) {
 	var form TodoForm
 
-	// Bind and validate the form
 	httpCode, errCode := response.BindAndValid(r, &form)
+
 	if httpCode != http.StatusOK {
 		response.ResponseJSON(w, httpCode, errCode, "Invalid form data", nil)
 		return
 	}
 
-	// Create the todo using the validated data
 	status := todo.Status(form.Status)
 
 	todos, err := client.Todo.
@@ -38,7 +57,9 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 		SetDescription(form.Description).
 		SetStatus(status).
 		Save(context.Background())
+
 	if err != nil {
+		log.Printf("Failed to create todo: %v", err)
 		response.ResponseJSON(w, http.StatusInternalServerError, 500, "Failed to create todo", nil)
 		return
 	}
@@ -46,8 +67,19 @@ func CreateTodo(w http.ResponseWriter, r *http.Request) {
 	response.ResponseJSON(w, http.StatusOK, 200, "Todo created successfully", todos)
 }
 
+// ListTodos godoc
+// @Summary List all Todos
+// @Description Get a list of all Todos
+// @Tags todos
+// @Produce  json
+// @Success 200 {array} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/todos [get]
 func ListTodos(w http.ResponseWriter, r *http.Request) {
-	todos, err := client.Todo.Query().All(context.Background())
+	todos, err := client.Todo.Query().
+		Where(todo.DeletedAtIsNil()). // deleted_at이 NULL인 항목만 조회
+		All(context.Background())
+
 	if err != nil {
 		response.ResponseJSON(w, http.StatusInternalServerError, 500, "Failed to list todos", nil)
 		return
@@ -56,14 +88,27 @@ func ListTodos(w http.ResponseWriter, r *http.Request) {
 	response.ResponseJSON(w, http.StatusOK, 200, "Todos fetched successfully", todos)
 }
 
+// GetTodo godoc
+// @Summary Get a Todo by ID
+// @Description Get details of a Todo by its ID
+// @Tags todos
+// @Produce  json
+// @Param id path int true "Todo ID"
+// @Success 200 {object} response.Response
+// @Failure 400 {object} response.Response
+// @Failure 404 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/todos/{id} [get]
 func GetTodo(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+
 	if err != nil {
 		response.ResponseJSON(w, http.StatusBadRequest, 400, "Invalid todo ID", nil)
 		return
 	}
 
-	todo, err := client.Todo.Get(context.Background(), id)
+	todos, err := client.Todo.Get(context.Background(), id)
+
 	if err != nil {
 		if ent.IsNotFound(err) {
 			response.ResponseJSON(w, http.StatusNotFound, 404, "Todo not found", nil)
@@ -73,11 +118,25 @@ func GetTodo(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	response.ResponseJSON(w, http.StatusOK, 200, "Todo fetched successfully", todo)
+	response.ResponseJSON(w, http.StatusOK, 200, "Todo fetched successfully", todos)
 }
 
+// UpdateTodo godoc
+// @Summary Update an existing Todo
+// @Description Update the details of a Todo by its ID
+// @Tags todos
+// @Accept  json
+// @Produce  json
+// @Param id path int true "Todo ID"
+// @Param todo body TodoForm true "Todo form"
+// @Success 200 {object} response.Response
+// @Failure 400 {object} response.Response
+// @Failure 404 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/todos/{id} [put]
 func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+
 	if err != nil {
 		response.ResponseJSON(w, http.StatusBadRequest, 400, "Invalid todo ID", nil)
 		return
@@ -91,6 +150,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	todos, err := client.Todo.Get(context.Background(), id)
+
 	if err != nil {
 		if ent.IsNotFound(err) {
 			response.ResponseJSON(w, http.StatusNotFound, 404, "Todo not found", nil)
@@ -107,6 +167,7 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 		SetDescription(form.Description).
 		SetStatus(status).
 		Save(context.Background())
+
 	if err != nil {
 		response.ResponseJSON(w, http.StatusInternalServerError, 500, "Failed to update todo", nil)
 		return
@@ -115,14 +176,29 @@ func UpdateTodo(w http.ResponseWriter, r *http.Request) {
 	response.ResponseJSON(w, http.StatusOK, 200, "Todo updated successfully", todos)
 }
 
+// DeleteTodo godoc
+// @Summary Soft delete a Todo by ID
+// @Description Soft delete a Todo by setting the deleted_at field
+// @Tags todos
+// @Param id path int true "Todo ID"
+// @Success 204 {object} nil
+// @Failure 400 {object} response.Response
+// @Failure 404 {object} response.Response
+// @Failure 500 {object} response.Response
+// @Router /api/v1/todos/{id} [delete]
 func DeleteTodo(w http.ResponseWriter, r *http.Request) {
 	id, err := strconv.Atoi(chi.URLParam(r, "id"))
+
 	if err != nil {
 		response.ResponseJSON(w, http.StatusBadRequest, 400, "Invalid todo ID", nil)
 		return
 	}
 
-	err = client.Todo.DeleteOneID(id).Exec(context.Background())
+	// 소프트 삭제를 위해 deleted_at 필드에 현재 시간을 설정
+	_, err = client.Todo.UpdateOneID(id).
+		SetDeletedAt(time.Now()).
+		Save(context.Background())
+
 	if err != nil {
 		if ent.IsNotFound(err) {
 			response.ResponseJSON(w, http.StatusNotFound, 404, "Todo not found", nil)
